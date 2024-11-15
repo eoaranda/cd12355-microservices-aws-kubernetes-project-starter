@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t coworking-analytics .
+      - echo Tagging the Docker image with the build number...
+      - docker tag coworking-analytics:latest $ECR_REPOSITORY_URI:coworking-analytics-$CODEBUILD_BUILD_NUMBER
+      - docker tag coworking-analytics:latest $ECR_REPOSITORY_URI:latest
+
+  post_build:
+    commands:
+      - echo Pushing the Docker image to ECR...
+      - docker push $ECR_REPOSITORY_URI:coworking-analytics-$CODEBUILD_BUILD_NUMBER
+      - docker push $ECR_REPOSITORY_URI:latest
+
+env:
+  variables:
+    AWS_REGION: "us-east-1"
+    ECR_REPOSITORY_URI: "816069130826.dkr.ecr.us-east-1.amazonaws.com/coworking-analytics" 
