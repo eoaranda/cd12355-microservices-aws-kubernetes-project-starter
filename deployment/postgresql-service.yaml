@@ -1,0 +1,11 @@
+#Before you expose your database, you will need to create a service, and then expose it using port-forwarding approach.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-service
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgresql
